@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
     // gearbox is constructed, you might have to invert the left side instead.
     
     m_leftMotor.setInverted(true);
+    m_rotController.setTolerance(0.25, 0.5);
     
   }
 
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the X turns left and right.
+    /*
     Vector2d input = new Vector2d(m_stick.getX(), m_stick.getY());
     input.rotate(gyro.getYaw());
 
@@ -52,8 +54,8 @@ public class Robot extends TimedRobot {
     }
     else{
       m_robotDrive.arcadeDrive(0f, m_rotController.calculate(Math.toDegrees(Math.atan2(input.y, input.x))));
-    }
-    /*
+    }*/
+    
     if (m_stick.getTrigger()){
       m_launchMotor.set(0.25);
     }
@@ -73,7 +75,7 @@ public class Robot extends TimedRobot {
     }
     else{
       m_robotDrive.arcadeDrive(-m_stick.getY()*(1f-m_overrideStick.getThrottle() + 0.25f), -m_stick.getX());
-    }*/
+    }
 
 
   }
