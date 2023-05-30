@@ -8,13 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-//import edu.wpi.first.wpilibj.drive.Vector2d;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
-
-import javax.lang.model.util.ElementScanner6;
-
-//import com.ctre.phoenix.sensors.Pigeon2;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with
@@ -36,15 +30,18 @@ public class Robot extends TimedRobot {
   private boolean isThrustmaster_Joystick = false;
   private final double launchMotorSpeed= 0.3;
   private int launchMotorTimer = 0;
+  //Cycles needed to spin up Launch motor to max speed
+  private final int launchMotorTimeToLaunchSpeed = 215;
 
   @Override
   public void robotInit() {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    
+    // gearbox is constructed, you might have to invert the left side instead.    
     m_leftMotor.setInverted(true);
     m_rotController.setTolerance(0.25, 0.5);    
+
+    //Determine if Logitech joysticks are in use or the Thrustmaster
     if (Logitech_Jotstick.equals(m_stick.getName()))
     {
       System.out.println("Logitech Joystick Detected");
@@ -67,29 +64,20 @@ public class Robot extends TimedRobot {
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the X turns left and right.
-    /*
-    Vector2d input = new Vector2d(m_stick.getX(), m_stick.getY());
-    input.rotate(gyro.getYaw());
 
-    if (m_rotController.atSetpoint()){
-      m_robotDrive.arcadeDrive(m_driveController.calculate(input.magnitude()), 0f);
-    }
-    else{
-      m_robotDrive.arcadeDrive(0f, m_rotController.calculate(Math.toDegrees(Math.atan2(input.y, input.x))));
-    }*/
-    
-    
-
+    //If the override is enabled with the trigger held down, take control
     if (m_overrideStick.getTrigger()){
       m_robotDrive.arcadeDrive(-m_overrideStick.getY(), -m_overrideStick.getX());
 
-      //Launch motor button 3, Stage motor button 2 
+      //Launch motor button 3, Stage motor button 2 on override stick
       if (m_overrideStick.getRawButton(3)){
         m_launchMotor.set(launchMotorSpeed);
-        if (launchMotorTimer <= 215) launchMotorTimer++;
+        //Increase the launch motor timer as motor speeds up
+        if (launchMotorTimer <= launchMotorTimeToLaunchSpeed) launchMotorTimer++;
       }
       else{
         m_launchMotor.set(0);
+        //Decrease the launch Motor timer as the motor slows down
         if (launchMotorTimer > 0) launchMotorTimer--;
       }
       //Checks if launcher button is pressed and launch motor is up to speed before staging
@@ -99,30 +87,30 @@ public class Robot extends TimedRobot {
       else{
         m_stageMotor.set(0);
       }
-
-    }
+    }  //End override enabled
     else{
       m_robotDrive.arcadeDrive(-m_stick.getY()*(getThrottle()), -m_stick.getX());
 
       if (m_stick.getTrigger()){
         m_launchMotor.set(launchMotorSpeed);
-        if (launchMotorTimer <= 215) launchMotorTimer++;
+        //Increase the launch motor timer as motor speeds up
+        if (launchMotorTimer <= launchMotorTimeToLaunchSpeed) launchMotorTimer++;
       }
       else{
         m_launchMotor.set(0);
+        //Decrease the launch Motor timer as the motor slows down
         if (launchMotorTimer > 0) launchMotorTimer--;
       }
-      //Checks if launcher button is pressed and launch motor is up to speed before staging
+      //Checks if launcher button is pressed and launch motor is up to speed 
+      // before staging can be used
       if ((m_stick.getTrigger()) && (m_stick.getRawButton(2)) && (launchMotorTimer > 215)){
         m_stageMotor.set(1);
       }
       else{
         m_stageMotor.set(0);
       }
-  
      
-    }
-
+    } //End not being overridden
 
   }
 
@@ -133,6 +121,7 @@ public class Robot extends TimedRobot {
       throttle = (1f-m_overrideStick.getThrottle() + 0.25f);
     else
     { 
+      //Trying different ways to fine tune robot speed using the joystick dial
       double z_throttle = m_overrideStick.getZ();
       double z_atan = Math.atan(z_throttle);
       double z_cubed = Math.pow(z_throttle, 3);
@@ -142,14 +131,7 @@ public class Robot extends TimedRobot {
       //Logitech Z is -1 to 1, convert to 0-1.
       double z_value = (((z_cubed)/* convert to 0-2 */ ) / 2 /*concert to 0-1 */);
      
-      //co
-      //z_value = z_value * .75; 
-      //
-      //z_value = z_value + .25;
-  
-     throttle = (1f-z_value);
-     
-      
+      throttle = (1f-z_value);          
     }
     return throttle;
   }
