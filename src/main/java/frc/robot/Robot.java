@@ -170,7 +170,7 @@ public class Robot extends TimedRobot {
      
     } //End not being overridden
 
-    
+    //this looks cool
     if (m_overrideStick.getRawButtonPressed(m_raiseHoodButtonID)){
       SetHoodMotor(0.1);
     }
