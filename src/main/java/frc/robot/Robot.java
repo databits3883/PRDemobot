@@ -4,10 +4,8 @@
 
 package frc.robot;
 
-import java.awt.Color;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import java.awt.Color;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
@@ -35,10 +33,9 @@ public class Robot extends TimedRobot {
   private final VictorSP m_rightMotor = new VictorSP(0);
   private final VictorSP m_launchMotor = new VictorSP(3);
   private final VictorSP m_stageMotor = new VictorSP(2);
-  private final CANSparkMax m_hoodMotor = new CANSparkMax(3, MotorType.kBrushless);
+  //private final CANSparkMax m_hoodMotor = new CANSparkMax(3, MotorType.kBrushless);
   private final PIDController m_rotController = new PIDController(1, 0, 0);
-  private final PIDController m_driveController = new PIDController(1, 0, 0);
- // private final Pigeon2 gyro = new Pigeon2(4);
+  // private final Pigeon2 gyro = new Pigeon2(4);
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
   private final Joystick m_stick = new Joystick(0);
   private final Joystick m_overrideStick = new Joystick(1);
@@ -46,15 +43,15 @@ public class Robot extends TimedRobot {
   private final String Thrustmaster_Joystick = "T.16000M";
   private boolean isThrustmaster_Joystick = false;
   private double launchMotorSpeed= 0.5;
-  private SendableChooser launchSpeedChooser;
+  private SendableChooser<Double> launchSpeedChooser;
   public int m_raiseHoodButtonID = 4;
   public int m_lowerHoodButtonID = 5;
   private int launchMotorTimer = 0;
   //Cycles needed to spin up Launch motor to max speed
-  private final int launchMotorTimeToLaunchSpeed = 150/* at 0.5 */;//215 at 0.3
+  private final int launchMotorTimeToLaunchSpeed = 100/* at 0.5 */;//215 at 0.3
   private int animationCounter = 0;
   //Reduce staging speed due to better stage motor
-  private double m_stageSpeed = 0.75;
+  private double m_stageSpeed = 0.25;
 
   @Override
   public void robotInit() {
@@ -89,10 +86,15 @@ public class Robot extends TimedRobot {
     launchSpeedChooser = new SendableChooser<Double>();
     Shuffleboard.getTab("Demo Menu").addDouble("Throttle", this::getThrottle);
     
-    launchSpeedChooser.setDefaultOption("50% [Default]", 0.5);
+    launchSpeedChooser.setDefaultOption("15% [Default]", 0.15);
     launchSpeedChooser.addOption("75%", 0.75);
     launchSpeedChooser.addOption("100%", 1.0);
+    launchSpeedChooser.addOption("40%", 0.4);
+    launchSpeedChooser.addOption("35%", 0.35);
+    launchSpeedChooser.addOption("30%", 0.3);
     launchSpeedChooser.addOption("25%", 0.25);
+    launchSpeedChooser.addOption("20%", 0.20);
+    launchSpeedChooser.addOption("50%", 0.5);
     launchSpeedChooser.addOption("10%", 0.1);
     launchSpeedChooser.addOption("0% (Off)", 0.0);
     Shuffleboard.getTab("Demo Menu").add(launchSpeedChooser);
@@ -166,25 +168,10 @@ public class Robot extends TimedRobot {
       }
       else{
         m_stageMotor.set(0);
-      }
+      }}
      
     } //End not being overridden
 
-    //this looks cool
-    if (m_overrideStick.getRawButtonPressed(m_raiseHoodButtonID)){
-      SetHoodMotor(0.1);
-    }
-    else if(m_overrideStick.getRawButtonReleased(m_raiseHoodButtonID)){
-      SetHoodMotor(0);
-    }
-    
-    if (m_overrideStick.getRawButtonPressed(m_lowerHoodButtonID)){
-      SetHoodMotor(-0.1);
-    }
-    else if(m_overrideStick.getRawButtonReleased(m_lowerHoodButtonID)){
-      SetHoodMotor(0);
-    }
-  }
 
 //duncan is not amazing according to 
   private void SpinUpLaunchMotor(){
@@ -213,9 +200,9 @@ public class Robot extends TimedRobot {
     return throttle;
   }
 
-  public void SetHoodMotor(double speed){
-    m_hoodMotor.set(speed);
-  }
+  //*public void SetHoodMotor(double speed){
+    //m_hoodMotor.set(speed);
+  //}
 
   private void WaveColorWithTime(Color8Bit color) {
     animationCounter +=5;
